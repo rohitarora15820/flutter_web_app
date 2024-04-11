@@ -37,35 +37,38 @@ class FrappeServices extends StateNotifier {
       'Accept': 'application/json',
     };
 
-   var data= document.cookie;
-   log("data"+data.toString());
 
+
+    dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) async {
+      options.extra["withCredentials"] = true;
+      return handler.next(options);
+    }));
     // Add the InterceptorsWrapper to the Dio instance for cookie management
-    dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-
-        log("cookiesData"+document.cookie.toString());
-        // Read cookies from the browser's cookie storage
-        var cookies = document.cookie!.split(';');
-        var cookieHeader = cookies.map((cookie) => cookie.trim()).join('; ');
-
-        // Add the cookies to the request headers
-        options.headers['Cookie'] = cookieHeader;
-
-        return handler.next(options);
-      },
-      onResponse: (response, handler) {
-        // Save cookies from the response to the browser's cookie storage
-        var setCookieHeaders = response.headers[HttpHeaders.setCookieHeader];
-        if (setCookieHeaders != null) {
-          for (var header in setCookieHeaders) {
-            document.cookie = header;
-          }
-        }
-
-        return handler.next(response);
-      },
-    ));
+    // dio.interceptors.add(InterceptorsWrapper(
+    //   onRequest: (options, handler) {
+    //
+    //     log("cookiesData"+document.cookie.toString());
+    //     // Read cookies from the browser's cookie storage
+    //     var cookies = document.cookie!.split(';');
+    //     var cookieHeader = cookies.map((cookie) => cookie.trim()).join('; ');
+    //
+    //     // Add the cookies to the request headers
+    //     options.headers['Cookie'] = cookieHeader;
+    //
+    //     return handler.next(options);
+    //   },
+    //   onResponse: (response, handler) {
+    //     // Save cookies from the response to the browser's cookie storage
+    //     var setCookieHeaders = response.headers[HttpHeaders.setCookieHeader];
+    //     if (setCookieHeaders != null) {
+    //       for (var header in setCookieHeaders) {
+    //         document.cookie = header;
+    //       }
+    //     }
+    //
+    //     return handler.next(response);
+    //   },
+    // ));
 
     // Add other interceptors as needed
     dio.interceptors.add(HttpFormatter());
